@@ -8,17 +8,34 @@ import ErrorMessage from "../errorMessage";
 
 export default function Verify() {
   const [otp, setOtp] = useState("");
-  const [userId, setUserId] = useState("");
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
-  const navigate = useNavigate();
+  let navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("registerInfo"));
+  const userId = user?._id;
 
   useEffect(() => {
-    if (success) {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      navigate("/home");
+    }
+  }, [navigate]);
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const config = {
+        headers: { "Content-type": "application/json" },
+      };
+      const { data } = await axios.post(
+        "/api/users/verify-email",
+        { userId, otp },
+        config
+      );
+      setLoading(false);
       setVariant("success");
       setMessage("Congratulation ,votre address email est vérifier");
       setInterval(() => {
@@ -27,37 +44,9 @@ export default function Verify() {
         );
       }, 2000);
       setInterval(() => {
-        navigate("/login");
-      }, 4000);
-    }
-    const registerInfoCheck = localStorage.getItem("registerInfo");
-    if (!registerInfoCheck) {
-      navigate("/");
-    }
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      navigate("/home");
-    }
-  }, [loading]);
-
-  const submitHandler = async (e) => {
-    e.preventDefault();
-
-    try {
-      const config = {
-        headers: { "Content-type": "application/json" },
-      };
-      setLoading(true);
-      // const registerInfo = JSON.parse(localStorage.getItem("registerInfo"));
-      //setUserId(registerInfo._id);
-
-      const { data } = await axios.post(
-        "/api/users/login",
-        { userId, otp },
-        config
-      );
-      setSuccess(true);
-      setLoading(false);
+        localStorage.removeItem("registerInfo");
+        navigate("/");
+      }, 3000);
     } catch (error) {
       setError(error.response.data.message);
       setLoading(false);

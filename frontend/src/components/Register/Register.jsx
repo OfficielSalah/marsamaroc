@@ -49,10 +49,10 @@ export default function Register() {
       setMessage("Password does not match !");
     } else {
       try {
+        setLoading(true);
         const config = {
           headers: { "Content-type": "application/json" },
         };
-        setLoading(true);
         const { data } = await axios.post(
           "/api/users/register",
           { login, password, email },

@@ -11,23 +11,22 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const userInfo = localStorage.getItem("userInfo");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       navigate("/home");
     }
-  }, [loading]);
+  }, [navigate]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-
     try {
+      setLoading(true);
       const config = {
         headers: { "Content-type": "application/json" },
       };
-      setLoading(true);
       const { data } = await axios.post(
         "/api/users/login",
         { login, password },
