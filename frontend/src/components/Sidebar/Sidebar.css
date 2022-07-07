@@ -1,0 +1,49 @@
+.sidebar {
+  height: 100%;
+  width: 22vw;
+  background-color: #3b3d3c;
+  position: absolute;
+}
+.sidelist {
+  height: auto;
+  width: 100%;
+  padding-top: 25px;
+  padding-left: 0px;
+}
+.siderow {
+  width: 100%;
+  height: 60px;
+  list-style-type: none;
+  margin: 0%;
+  display: flex;
+  flex-direction: row;
+  color: #d12a21;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: large;
+  padding-top: 10px;
+}
+.siderow #icon {
+  flex: 30%;
+  display: grid;
+  place-items: center;
+}
+.siderow #title {
+  flex: 70%;
+}
+#title {
+  color: white;
+}
+
+.sidelist .siderow:hover {
+  cursor: pointer;
+  background-color: #d12a21;
+}
+.login {
+  color: white;
+  font-weight: 600;
+  font-size: larger;
+  text-align: center;
+  padding-top: 30px;
+}

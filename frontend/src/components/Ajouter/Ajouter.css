@@ -1,0 +1,32 @@
+body {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.home {
+  height: 100vh;
+  width: 100vw;
+}
+.profilee {
+  position: absolute;
+  right: 25vw;
+  top: 10px;
+}
+.forme {
+  background-color: #3b3d3c;
+  color: white;
+  margin-top: 10vh;
+}
+.btn-primary {
+  background-color: #d12a21;
+}
+.button {
+  padding: 15px;
+}
+.demande {
+  text-align: center;
+  color: #d12a21;
+  font-weight: bold;
+  margin-top: 5vh;
+}

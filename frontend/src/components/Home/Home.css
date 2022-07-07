@@ -1,0 +1,28 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+.homee {
+  height: 100vh;
+  width: 100vw;
+}
+.bien {
+  font-weight: 1500;
+  text-align: center;
+  padding-top: 10vh;
+  padding-left: 20vw;
+  word-wrap: break-word;
+}
+.bien h1 {
+  color: black;
+  font-weight: bolder;
+}
+
+.rule {
+  padding-top: 30vh;
+  color: #d12a21;
+}
+
+.last {
+  font-weight: bold;
+}

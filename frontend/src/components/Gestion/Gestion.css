@@ -1,0 +1,47 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.home {
+  height: 100vh;
+  width: 100vw;
+}
+.employe {
+  position: absolute;
+  top: 10vh;
+  right: 2vw;
+  width: 70vw;
+}
+
+.gestion {
+  text-align: center;
+  color: #d12a21;
+  font-weight: bold;
+  margin-top: 2vh;
+}
+.cell-1 {
+  border-collapse: separate;
+  border-spacing: 0 4em;
+  background: #fff;
+  border-bottom: 5px solid transparent;
+  background-clip: padding-box;
+}
+
+thead {
+  background: #dddcdc;
+}
+.card-header {
+  display: flex;
+}
+.title {
+  color: black;
+  text-decoration: none;
+  flex: 1;
+  cursor: pointer;
+  align-self: center;
+  font-size: 18;
+}
+.card {
+  margin: 10;
+}

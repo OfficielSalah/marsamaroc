@@ -1,0 +1,32 @@
+body {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.home {
+  height: 100vh;
+  width: 100vw;
+}
+.profile {
+  position: absolute;
+  right: 9vw;
+  top: 10px;
+}
+.form {
+  background-color: #3b3d3c;
+  color: white;
+  margin-top: 10vh;
+}
+.btn-primary {
+  background-color: #d12a21;
+}
+.button {
+  padding: 15px;
+}
+.prof {
+  text-align: center;
+  color: #d12a21;
+  font-weight: bold;
+  margin-top: 5vh;
+}
