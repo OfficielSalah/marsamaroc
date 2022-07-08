@@ -26,6 +26,7 @@ const authUser = asyncHandler(async (req, res) => {
     res.json({
       _id: user._id,
       login: user.login,
+      isverified: user.isverified,
       token: generateToken(user._id),
     });
   } else {

@@ -11,14 +11,19 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const userInfo = localStorage.getItem("userInfo");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  let vrf = userInfo?.isverified;
   const navigate = useNavigate();
 
   useEffect(() => {
     if (userInfo) {
-      navigate("/home");
+      if (vrf) {
+        navigate("/home");
+      } else {
+        setError("Your Account is not yet Verified");
+      }
     }
-  }, [navigate]);
+  }, [loading]);
 
   const submitHandler = async (e) => {
     e.preventDefault();

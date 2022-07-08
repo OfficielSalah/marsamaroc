@@ -13,7 +13,6 @@ export default function Forget() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
-  const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -27,15 +26,9 @@ export default function Forget() {
         { email },
         config
       );
-
-      setVariant("success");
-      setMessage(
-        "Password reset link is sent to your email , Now You will be redirected to reset page"
-      );
       setLoading(false);
-      setTimeout(() => {
-        navigate("/reset-password");
-      }, 3000);
+      setVariant("success");
+      setMessage("Password reset link is sent to your email");
     } catch (error) {
       setError(error.response.data.message);
       setLoading(false);

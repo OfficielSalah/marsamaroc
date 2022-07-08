@@ -90,7 +90,7 @@ export default function Reset() {
         </p>
         <p>
           <button id="sub_btn" type="submit">
-            Se Connecter
+            Reset Password
           </button>
         </p>
       </form>

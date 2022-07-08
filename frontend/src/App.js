@@ -19,9 +19,9 @@ export default function App() {
     <Router>
       <Routes>
         <Route exact path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<Verify />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/forget-password" element={<Forget />} />
         <Route path="/reset-password" element={<Reset />} />
         <Route path="/home" element={<Home />} />

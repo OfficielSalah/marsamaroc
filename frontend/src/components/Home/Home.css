@@ -1,13 +1,8 @@
-body {
-  padding: 0;
-  margin: 0;
-}
 .homee {
   height: 100vh;
   width: 100vw;
 }
 .bien {
-  font-weight: 1500;
   text-align: center;
   padding-top: 10vh;
   padding-left: 20vw;

@@ -19,6 +19,27 @@ export default function Register() {
 
   const navigate = useNavigate();
 
+  function delay(s) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(2);
+      }, s);
+    });
+  }
+
+  const redirect = async () => {
+    setVariant("success");
+    setMessage(
+      "Congratulation ,a confirmation code had been sent to your address email"
+    );
+    await delay(2000);
+    setMessage(
+      "you will be redirected to the email verification page after a moment ..."
+    );
+    await delay(3000);
+    navigate("/verify-email");
+  };
+
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
@@ -26,18 +47,7 @@ export default function Register() {
     }
     const registerInfo = localStorage.getItem("registerInfo");
     if (registerInfo) {
-      setVariant("success");
-      setMessage(
-        "Congratulation ,a confirmation code had been sent to your address email"
-      );
-      setInterval(() => {
-        setMessage(
-          "you will be redirected to the email verification page after a moment ..."
-        );
-      }, 2000);
-      setInterval(() => {
-        navigate("/verify-email");
-      }, 4000);
+      redirect();
     }
   }, [loading]);
 

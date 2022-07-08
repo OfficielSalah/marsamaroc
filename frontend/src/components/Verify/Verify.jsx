@@ -10,18 +10,40 @@ export default function Verify() {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
-  let navigate = useNavigate();
+
   const user = JSON.parse(localStorage.getItem("registerInfo"));
   const userId = user?._id;
+  const navigate = useNavigate();
+
+  function delay(s) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(2);
+      }, s);
+    });
+  }
+
+  const redirect = async () => {
+    setVariant("success");
+    setMessage("Congratulation ,votre address email est vérifier .");
+    await delay(3000);
+    setMessage("you will be redirected to the login page after a moment ...");
+    await delay(2000);
+    navigate("/login");
+  };
 
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       navigate("/home");
     }
-  }, [navigate]);
+    if (success) {
+      redirect();
+    }
+  }, [success]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -35,20 +57,12 @@ export default function Verify() {
         { userId, otp },
         config
       );
+      localStorage.removeItem("registerInfo");
+      setSuccess(true);
       setLoading(false);
-      setVariant("success");
-      setMessage("Congratulation ,votre address email est vérifier");
-      setInterval(() => {
-        setMessage(
-          "you will be redirected to the login page after a moment ..."
-        );
-      }, 2000);
-      setInterval(() => {
-        localStorage.removeItem("registerInfo");
-        navigate("/");
-      }, 3000);
     } catch (error) {
       setError(error.response.data.message);
+
       setLoading(false);
     }
   };
