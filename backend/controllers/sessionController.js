@@ -1,5 +1,5 @@
 const Session = require("../models/Session");
-const asyncHandler = require("express-async-handler");
+const asyncHandler = require("../middlewares/asyncMiddleware");
 
 const ajouterSession = asyncHandler(async (req, res) => {
   const { num, date_d, date_f } = req.body;

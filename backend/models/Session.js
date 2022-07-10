@@ -1,5 +1,4 @@
 var mongoose = require("mongoose");
-var autoIncrement = require("mongoose-auto-increment");
 
 const sessionSchema = mongoose.Schema({
   num: {
@@ -12,5 +11,4 @@ const sessionSchema = mongoose.Schema({
   date_f: { type: String, required: true },
 });
 
-ItemSchema.plugin(autoIncrement, { id: "session_num", inc_field: "num" });
 module.exports = mongoose.model("Session", sessionSchema);

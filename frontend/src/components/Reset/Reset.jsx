@@ -19,9 +19,7 @@ export default function Reset() {
 
   const verifyToken = async () => {
     try {
-      const { data } = await axios.get(
-        `/api/users/verify-token?token=${token}&id=${id}`
-      );
+      await axios.get(`/api/users/verify-token?token=${token}&id=${id}`);
     } catch (error) {
       if (error?.response?.data) {
         return console.log(error.response.data);

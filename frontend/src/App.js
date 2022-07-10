@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+import PrivateRoute from "./components/PrivateRoute";
 import Landing from "./components/Landing/Landing";
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
@@ -24,11 +25,47 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forget-password" element={<Forget />} />
         <Route path="/reset-password" element={<Reset />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/ajouter" element={<Ajouter />} />
-        <Route path="/historique" element={<Historique />} />
-        <Route path="/gestion" element={<Gestion />} />
+        <Route
+          path="/home"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ajouter"
+          element={
+            <PrivateRoute>
+              <Ajouter />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/historique"
+          element={
+            <PrivateRoute>
+              <Historique />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/gestion"
+          element={
+            <PrivateRoute>
+              <Gestion />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<p>There's nothing here: 404!</p>} />
       </Routes>
     </Router>
   );

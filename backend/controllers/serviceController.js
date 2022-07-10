@@ -1,5 +1,5 @@
 const Service = require("../models/Service");
-const asyncHandler = require("express-async-handler");
+const asyncHandler = require("../middlewares/asyncMiddleware");
 
 const ajouterService = asyncHandler(async (req, res) => {
   const { ser_nom, ser_code, chef_id } = req.body;

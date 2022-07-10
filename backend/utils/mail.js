@@ -6,14 +6,6 @@ const mailTransport = () =>
     port: 2525,
     auth: { user: process.env.MAILTRAP_USER, pass: process.env.MAILTRAP_PASS },
   });
-const generateOTP = () => {
-  let otp = "";
-  for (let i = 0; i <= 3; i++) {
-    const randVal = Math.round(Math.random() * 9);
-    otp = otp + randVal;
-  }
-  return otp;
-};
 
 const verifyEmailTemplate = (code) => {
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -1184,7 +1176,6 @@ const resetPasswordTemplate = (url) => {
   `;
 };
 module.exports = {
-  generateOTP,
   verifyEmailTemplate,
   resetPasswordTemplate,
   mailTransport,

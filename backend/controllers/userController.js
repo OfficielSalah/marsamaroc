@@ -1,51 +1,49 @@
 const User = require("../models/User");
-const OtpToken = require("../models/otpToken");
-const ResetToken = require("../models/resetToken");
-const asyncHandler = require("express-async-handler");
-const generateToken = require("../utils/generateToken");
-const randomByte = require("../utils/randomByte");
-const {
-  generateOTP,
-  mailTransport,
-  verifyEmailTemplate,
-  resetPasswordTemplate,
-} = require("../utils/mail");
-const { isValidObjectId } = require("mongoose");
+const UserService = require("../services/userService");
+const asyncHandler = require("../middlewares/asyncMiddleware");
 
-const authUser = asyncHandler(async (req, res) => {
+const authUser = asyncHandler(async (req, res, next) => {
   const { login, password } = req.body;
-
-  const user = await User.findOne({ login });
-
-  if (!user) {
-    res.status(404);
-    throw new Error("user Not Found");
-  }
-
-  if (await user.matchPassword(password)) {
-    res.json({
-      _id: user._id,
-      login: user.login,
-      isverified: user.isverified,
-      token: generateToken(user._id),
+  try {
+    const data = await UserService.authUser(login, password);
+    res.status(200).json({
+      _id: data.user._id,
+      login: data.user.login,
+      isverified: data.user.isverified,
+      token: data.token,
     });
-  } else {
-    res.status(401);
-    throw new Error("wrong Password");
+  } catch (error) {
+    next(error);
   }
 });
 
-const updateProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+const updateProfile = asyncHandler(async (req, res, next) => {
+  const { nom, matricule, stf, ser_Id, category, date_emb, nbr_enf, gsm } =
+    req.body;
+  const id = req.user._id;
+  try {
+    const data = await updateProfile.authUser(
+      id,
+      nom,
+      matricule,
+      stf,
+      ser_Id,
+      category,
+      date_emb,
+      nbr_enf,
+      gsm
+    );
+    res.status(200).json({
+      _id: data.user._id,
+      login: data.user.login,
+      isverified: data.user.isverified,
+      token: data.token,
+    });
+  } catch (error) {
+    next(error);
+  }
 
-  user.nom = req.body.nom || user.nom;
-  user.matricule = req.body.matricule || user.matricule;
-  user.stf = req.body.stf || user.stf;
-  user.ser_Id = req.body.ser_Id || user.ser_Id;
-  user.category = req.body.category || user.category;
-  user.date_emb = req.body.date_emb || user.date_emb;
-  user.nbr_enf = req.body.nbr_enf || user.nbr_enf;
-  user.gsm = req.body.gsm || user.gsm;
+  const user = await User.findById(req.user._id);
 
   const updatedUser = await user.save();
 
@@ -63,161 +61,68 @@ const updateProfile = asyncHandler(async (req, res) => {
   });
 });
 
-const registerUser = asyncHandler(async (req, res) => {
+const registerUser = asyncHandler(async (req, res, next) => {
   const { login, email, password } = req.body;
-
-  if (!login || !email || !password) {
-    res.status(400);
-    throw new Error("login or email or password not valid");
-  }
-
-  const userExist = await User.findOne({ login });
-  const userExist2 = await User.findOne({ email });
-  if (userExist || userExist2) {
-    res.status(401);
-    throw new Error("User Already Exist");
-  }
-
-  const user = await User.create({
-    login,
-    email,
-    password,
-  });
-
-  const OTP = generateOTP();
-  await OtpToken.create({
-    owner: user._id,
-    token: OTP,
-  });
-
-  mailTransport().sendMail({
-    from: "marocmarsa@outlook.com",
-    to: user.email,
-    subject: "Verify your email account",
-    html: verifyEmailTemplate(OTP),
-  });
-
-  if (user) {
-    res.json({
+  try {
+    const user = await UserService.registerUser(login, email, password);
+    res.status(200).json({
       _id: user._id,
       login: user.login,
       email: user.email,
       isverified: user.isverified,
     });
-  } else {
-    res.status(403);
-    throw new Error("Error Occured");
+  } catch (error) {
+    next(error);
   }
 });
 
-const verifyEmail = asyncHandler(async (req, res) => {
+const verifyEmail = asyncHandler(async (req, res, next) => {
   const { userId, otp } = req.body;
-  if (!userId || !otp.trim()) {
-    res.status(400);
-    throw new Error("userId or otp not valid");
+  try {
+    const user = await UserService.verifyEmail(userId, otp);
+    res.status(200).json({
+      _id: user._id,
+      isverified: user.isverified,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  if (!isValidObjectId(userId)) {
-    res.status(401);
-    throw new Error("unvalid userId");
-  }
-
-  const user = await User.findById(userId);
-  if (!user) {
-    res.status(404);
-    throw new Error("user Not Found");
-  }
-
-  if (user.verified) {
-    res.status(402);
-    throw new Error("user already verified");
-  }
-
-  const token = await OtpToken.findOne({ owner: user._id });
-  if (!token) {
-    res.status(405);
-    throw new Error("user Not Found");
-  }
-
-  const isMatched = await token.compareToken(otp);
-  if (!isMatched) {
-    res.status(406);
-    throw new Error("Please provide a valid token");
-  }
-  user.isverified = true;
-  await OtpToken.findByIdAndDelete(token._id);
-  await user.save();
-  res.json({
-    _id: user._id,
-    isverified: user.isverified,
-  });
 });
 
-const forgetPassword = asyncHandler(async (req, res) => {
+const forgetPassword = asyncHandler(async (req, res, next) => {
   const { email } = req.body;
 
-  if (!email) {
-    res.status(400);
-    throw new Error("email not valid");
+  try {
+    const user = await UserService.forgetPassword(email);
+    res.status(200).json({
+      _id: user._id,
+      email: user.email,
+      action: `link sent to ${user.email}`,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    res.status(404);
-    throw new Error("user Not Found");
-  }
-
-  const token = await ResetToken.findOne({ owner: user._id });
-
-  if (token) {
-    res.status(405);
-    throw new Error("Only after one hour you can request for another token !");
-  }
-
-  const randomBytes = await randomByte();
-  const resetToken = new ResetToken({ owner: user._id, token: randomBytes });
-  await resetToken.save();
-
-  mailTransport().sendMail({
-    from: "marocmarsa@email.com",
-    to: user.email,
-    subject: "Password Reset",
-    html: resetPasswordTemplate(
-      `http://localhost:3000/reset-password?token=${randomBytes}&id=${user._id}`
-    ),
-  });
-  res.json({
-    _id: user._id,
-    email: user.email,
-    action: `link sent to ${user.email}`,
-  });
 });
-const resetPassword = asyncHandler(async (req, res) => {
+const resetPassword = asyncHandler(async (req, res, next) => {
   const { password } = req.body;
-  const user = await User.findById(req.user._id);
+  const id = req.user._id;
 
-  const isSamePassword = await user.matchPassword(password);
-  if (isSamePassword) {
-    res.status(400);
-    throw new Error("new password must be different");
+  try {
+    await UserService.resetPassword(password, id);
+    res.status(200).json({
+      success: true,
+      message: "Password Reset Successfully",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  user.password = password.trim();
-  await user.save();
-  await ResetToken.findOneAndDelete({ owner: user._id });
-
-  res.json({
-    success: true,
-    message: "Password Reset Successfully",
-  });
 });
 
 module.exports = {
   registerUser,
-  authUser,
-  updateProfile,
   verifyEmail,
   forgetPassword,
   resetPassword,
+  authUser,
+  updateProfile,
 };

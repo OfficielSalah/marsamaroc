@@ -1,7 +1,7 @@
 const Demande = require("../models/Demande");
 const User = require("../models/User");
 const Service = require("../models/Service");
-const asyncHandler = require("express-async-handler");
+const asyncHandler = require("../middlewares/asyncMiddleware");
 const { mailTransport } = require("../utils/mail");
 
 const ajouterDemande = asyncHandler(async (req, res) => {
