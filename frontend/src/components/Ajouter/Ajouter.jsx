@@ -22,6 +22,10 @@ export default function Ajouter() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (!userInfo) {
+      navigate("/login");
+    }
     setUser(JSON.parse(localStorage.getItem("userInfo")));
     setSessions([
       "21/06 - 30/06",

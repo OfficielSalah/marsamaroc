@@ -2,6 +2,7 @@ import axios from "axios";
 import React from "react";
 import { useState, useEffect } from "react";
 import { Accordion, Card, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar/Sidebar";
 import Loading from "../Loading";
 import ErrorMessage from "../errorMessage";
@@ -15,8 +16,9 @@ export default function Gestion() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(null);
   const [count, setCount] = useState(0);
+  const navigate = useNavigate();
 
-  const token = JSON.parse(localStorage.getItem("userInfo")).token;
+  const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
   const config = {
     headers: {
       "Content-type": "application/json",
@@ -42,6 +44,10 @@ export default function Gestion() {
   };
 
   useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (!userInfo) {
+      navigate("/login");
+    }
     setUser(JSON.parse(localStorage.getItem("userInfo")));
     if (data.length === 0 && count < 5) {
       getdata();

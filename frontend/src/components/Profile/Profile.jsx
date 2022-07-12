@@ -1,7 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import Sidebar from "../Sidebar/Sidebar";
-import Loading from "../Loading";
 import axios from "axios";
 import ErrorMessage from "../errorMessage";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +31,10 @@ export default function Profil() {
   };
 
   useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (!userInfo) {
+      navigate("/login");
+    }
     setUser(JSON.parse(localStorage.getItem("userInfo")));
     getdata();
   }, []);

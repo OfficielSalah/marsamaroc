@@ -13,8 +13,8 @@ export default function Reset() {
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
   const location = useLocation();
+  const pass = JSON.parse(localStorage.getItem("userInfo"));
   const navigate = useNavigate();
-
   const { token, id } = queryString.parse(location.search);
 
   const verifyToken = async () => {
@@ -29,6 +29,9 @@ export default function Reset() {
   };
 
   useEffect(() => {
+    if (pass?.isverified) {
+      navigate("/home");
+    }
     verifyToken();
   }, []);
 

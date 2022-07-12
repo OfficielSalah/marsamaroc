@@ -183,6 +183,10 @@ const updateProfile = async (
 ) => {
   const user = await User.findById(id);
 
+  if (!user) {
+    throw new ErrorResponse("User Not Found", 404);
+  }
+
   user.nom = nom || user.nom;
   user.matricule = matricule || user.matricule;
   user.stf = stf || user.stf;
@@ -194,18 +198,11 @@ const updateProfile = async (
 
   const updatedUser = await user.save();
 
-  res.json({
-    _id: updatedUser._id,
-    nom: updatedUser.nom,
-    matricule: updatedUser.matricule,
-    ser_Id: updatedUser.ser_Id,
-    category: updatedUser.category,
-    stf: updatedUser.stf,
-    date_emb: updatedUser.date_emb,
-    nbr_enf: updatedUser.nbr_enf,
-    gsm: updatedUser.gsm,
-    token: generateToken(updatedUser._id),
-  });
+  if (!updatedUser) {
+    throw new ErrorResponse("Couldn't Update User", 402);
+  }
+
+  return user;
 };
 
 module.exports = {

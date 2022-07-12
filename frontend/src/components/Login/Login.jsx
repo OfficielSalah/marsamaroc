@@ -11,15 +11,22 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  let vrf = userInfo?.isverified;
+  const [data, setData] = useState("");
+  const pass = JSON.parse(localStorage.getItem("userInfo"));
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userInfo) {
-      if (vrf) {
+    if (pass?.isverified) {
+      navigate("/home");
+    }
+    if (data) {
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      let user = JSON.parse(JSON.stringify(data));
+      if (user.isverified) {
         navigate("/home");
       } else {
+        localStorage.removeItem("userInfo");
         setError("Your Account is not yet Verified");
       }
     }
@@ -37,7 +44,7 @@ export default function Login() {
         { login, password },
         config
       );
-      localStorage.setItem("userInfo", JSON.stringify(data));
+      setData(data);
       setLoading(false);
     } catch (error) {
       setError(error.response.data.message);
@@ -71,6 +78,7 @@ export default function Login() {
           <input
             type="password"
             name="password"
+            autoComplete="true"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}

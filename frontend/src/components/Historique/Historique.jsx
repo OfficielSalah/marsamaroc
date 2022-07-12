@@ -2,6 +2,7 @@ import axios from "axios";
 import React from "react";
 import { useState, useEffect } from "react";
 import Sidebar from "../Sidebar/Sidebar";
+import { useNavigate } from "react-router-dom";
 import Loading from "../Loading";
 import "./Historique.css";
 
@@ -17,8 +18,13 @@ export default function Historique() {
       Authorization: `Bearer ${token}`,
     },
   };
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (!userInfo) {
+      navigate("/login");
+    }
     setUser(JSON.parse(localStorage.getItem("userInfo")));
     getdata();
   }, []);

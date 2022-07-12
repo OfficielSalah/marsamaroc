@@ -1,11 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-const reqString = {
-  type: String,
-  required: true,
-};
-
 const userSchema = mongoose.Schema(
   {
     login: {
@@ -20,7 +15,10 @@ const userSchema = mongoose.Schema(
       index: true,
       unique: true,
     },
-    password: reqString,
+    password: {
+      type: String,
+      required: true,
+    },
     ischef: { type: Boolean, default: false },
 
     nom: String,

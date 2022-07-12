@@ -11,11 +11,11 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmepassword, setConfirmepassword] = useState("");
-
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const pass = JSON.parse(localStorage.getItem("userInfo"));
 
   const navigate = useNavigate();
 
@@ -41,8 +41,7 @@ export default function Register() {
   };
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
+    if (pass?.isverified) {
       navigate("/home");
     }
     const registerInfo = localStorage.getItem("registerInfo");

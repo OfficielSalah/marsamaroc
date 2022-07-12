@@ -13,7 +13,7 @@ export default function Verify() {
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
-
+  const pass = JSON.parse(localStorage.getItem("userInfo"));
   const user = JSON.parse(localStorage.getItem("registerInfo"));
   const userId = user?._id;
   const navigate = useNavigate();
@@ -36,8 +36,7 @@ export default function Verify() {
   };
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
+    if (pass?.isverified) {
       navigate("/home");
     }
     if (success) {
@@ -62,7 +61,6 @@ export default function Verify() {
       setLoading(false);
     } catch (error) {
       setError(error.response.data.message);
-
       setLoading(false);
     }
   };

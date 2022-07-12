@@ -1,4 +1,3 @@
-const User = require("../models/User");
 const UserService = require("../services/userService");
 const asyncHandler = require("../middlewares/asyncMiddleware");
 
@@ -22,7 +21,7 @@ const updateProfile = asyncHandler(async (req, res, next) => {
     req.body;
   const id = req.user._id;
   try {
-    const data = await updateProfile.authUser(
+    const user = await UserService.updateProfile(
       id,
       nom,
       matricule,
@@ -34,31 +33,14 @@ const updateProfile = asyncHandler(async (req, res, next) => {
       gsm
     );
     res.status(200).json({
-      _id: data.user._id,
-      login: data.user.login,
-      isverified: data.user.isverified,
-      token: data.token,
+      _id: user._id,
+      login: user.login,
+      matricule: user.matricule,
+      action: "User Updated",
     });
   } catch (error) {
     next(error);
   }
-
-  const user = await User.findById(req.user._id);
-
-  const updatedUser = await user.save();
-
-  res.json({
-    _id: updatedUser._id,
-    nom: updatedUser.nom,
-    matricule: updatedUser.matricule,
-    ser_Id: updatedUser.ser_Id,
-    category: updatedUser.category,
-    stf: updatedUser.stf,
-    date_emb: updatedUser.date_emb,
-    nbr_enf: updatedUser.nbr_enf,
-    gsm: updatedUser.gsm,
-    token: generateToken(updatedUser._id),
-  });
 });
 
 const registerUser = asyncHandler(async (req, res, next) => {

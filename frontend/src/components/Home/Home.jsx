@@ -9,11 +9,11 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("userInfo")));
     const userInfo = localStorage.getItem("userInfo");
     if (!userInfo) {
-      navigate("/");
+      navigate("/login");
     }
+    setUser(JSON.parse(localStorage.getItem("userInfo")));
   }, []);
   return (
     <div className="homee">
