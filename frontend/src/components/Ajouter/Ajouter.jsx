@@ -4,52 +4,76 @@ import Sidebar from "../Sidebar/Sidebar";
 import axios from "axios";
 import ErrorMessage from "../errorMessage";
 import { useNavigate } from "react-router-dom";
+import Loading from "../Loading";
+import delay from "../delay";
 import "./Ajouter.css";
 
 export default function Ajouter() {
-  const [user, setUser] = useState("");
-  const [cv1, setCv1] = useState("");
-  const [cv2, setCv2] = useState("");
-  const [cv3, setCv3] = useState("");
-  const [p1, setP1] = useState("");
-  const [p2, setP2] = useState("");
-  const [p3, setP3] = useState("");
-  const [sessions, setSessions] = useState([]);
-  const [nbr_plc, setNbr_plc] = useState("");
+  const [values, setValues] = useState({
+    cv1: "",
+    cv2: "",
+    cv3: "",
+    s1: "",
+    s2: "",
+    s3: "",
+    nbr_plc: "",
+  });
+  const [data, setData] = useState([]);
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
+  const userInfo = localStorage.getItem("userInfo");
+  const user_id = JSON.parse(userInfo)?._id;
+  const token = JSON.parse(userInfo)?.token;
+
+  const redirect = async () => {
+    setVariant("success");
+    setMessage("Congratulation , Votre demande est enregistrée");
+    await delay(2000);
+    setMessage("you will be redirected to the home page after a moment ...");
+    await delay(3000);
+    navigate("/home");
+  };
+
+  const handlechange = (e) => {
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value });
+  };
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
     if (!userInfo) {
       navigate("/login");
     }
-    setUser(JSON.parse(localStorage.getItem("userInfo")));
-    setSessions([
-      "21/06 - 30/06",
-      "01/07 - 10/07",
-      "11/07 - 20/07",
-      "21/07 - 30/07",
-      "01/08 - 10/08",
-      "11/08 - 20/08",
-      "21/08 - 30/08",
-      "01/09 - 10/09",
-      "11/09 - 20/09",
-    ]);
-  }, []);
+    if (data.length === 0) {
+      getdata();
+    }
+    if (success) {
+      redirect();
+    }
+  }, [success]);
+
+  const getdata = async () => {
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+    await axios.get("/api/sessions/", config).then((response) => {
+      setData(response.data.sessions);
+    });
+  };
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const token = JSON.parse(localStorage.getItem("userInfo")).token;
-      const userid = JSON.parse(localStorage.getItem("userInfo"))._id;
-      const date = new Date().getFullYear();
+      setLoading(true);
       const choixs = [
-        { centre: cv1, session: p1 },
-        { centre: cv2, session: p2 },
-        { centre: cv3, session: p3 },
+        { priorité: 1, centre: values.cv1, session_id: values.s1 },
+        { priorité: 2, centre: values.cv2, session_id: values.s2 },
+        { priorité: 3, centre: values.cv3, session_id: values.s3 },
       ];
       const config = {
         headers: {
@@ -59,25 +83,25 @@ export default function Ajouter() {
       };
       await axios.post(
         "/api/demandes/ajouter",
-        { userid, choixs, nbr_plc, date },
+        { user_id, nbr_plc: values.nbr_plc, choixs },
         config
       );
-      setVariant("success");
-      setMessage("Congratulation , Votre demande est enregistrée");
-      setTimeout(() => {
-        setMessage(null);
-        navigate("/home");
-      }, 3000);
+      setLoading(false);
+      setSuccess(true);
     } catch (error) {
-      setError(error.response.data.message);
+      setLoading(false);
+      setError(error.response.data.error);
+      await delay(2000);
+      setError(null);
     }
   };
   return (
     <div className="home">
-      <Sidebar login={user.login} />
+      <Sidebar />
       <div className="profilee">
         <h1 className="demande">Ajouter Demande</h1>
         <form className="forme" onSubmit={submitHandler}>
+          {loading && <Loading />}
           {message && <ErrorMessage variant={variant}>{message}</ErrorMessage>}
           {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
           <div className="row button">
@@ -88,8 +112,8 @@ export default function Ajouter() {
                   name="cv1"
                   className="form-control"
                   required
-                  value={cv1}
-                  onChange={(e) => setCv1(e.target.value)}
+                  value={values.cv1}
+                  onChange={handlechange}
                 >
                   <option
                     className="form-control"
@@ -116,11 +140,11 @@ export default function Ajouter() {
                 <label>session 1</label>
 
                 <select
-                  name="p1"
+                  name="s1"
                   className="form-control"
                   required
-                  value={p1}
-                  onChange={(e) => setP1(e.target.value)}
+                  value={values.s1}
+                  onChange={handlechange}
                 >
                   <option
                     className="form-control"
@@ -130,10 +154,10 @@ export default function Ajouter() {
                   >
                     choisissez
                   </option>
-                  {sessions.map((val, key) => {
+                  {data.map((val, key) => {
                     return (
-                      <option value={val} key={key}>
-                        {val}
+                      <option value={val._id} key={key}>
+                        {val.date_d + " - " + val.date_f}
                       </option>
                     );
                   })}
@@ -150,8 +174,8 @@ export default function Ajouter() {
                   name="cv2"
                   className="form-control"
                   required
-                  value={cv2}
-                  onChange={(e) => setCv2(e.target.value)}
+                  value={values.cv2}
+                  onChange={handlechange}
                 >
                   <option
                     className="form-control"
@@ -178,11 +202,11 @@ export default function Ajouter() {
                 <label>session 2</label>
 
                 <select
-                  name="p2"
+                  name="s2"
                   className="form-control"
                   required
-                  value={p2}
-                  onChange={(e) => setP2(e.target.value)}
+                  value={values.s2}
+                  onChange={handlechange}
                 >
                   <option
                     className="form-control"
@@ -192,10 +216,10 @@ export default function Ajouter() {
                   >
                     choisissez
                   </option>
-                  {sessions.map((val, key) => {
+                  {data.map((val, key) => {
                     return (
-                      <option value={val} key={key}>
-                        {val}
+                      <option value={val._id} key={key}>
+                        {val.date_d + " - " + val.date_f}
                       </option>
                     );
                   })}
@@ -212,8 +236,8 @@ export default function Ajouter() {
                   name="cv3"
                   className="form-control"
                   required
-                  value={cv3}
-                  onChange={(e) => setCv3(e.target.value)}
+                  value={values.cv3}
+                  onChange={handlechange}
                 >
                   <option
                     className="form-control"
@@ -240,11 +264,11 @@ export default function Ajouter() {
                 <label>session 3</label>
 
                 <select
-                  name="p3"
+                  name="s3"
                   className="form-control"
                   required
-                  value={p3}
-                  onChange={(e) => setP3(e.target.value)}
+                  value={values.s3}
+                  onChange={handlechange}
                 >
                   <option
                     className="form-control"
@@ -254,10 +278,10 @@ export default function Ajouter() {
                   >
                     choisissez
                   </option>
-                  {sessions.map((val, key) => {
+                  {data.map((val, key) => {
                     return (
-                      <option value={val} key={key}>
-                        {val}
+                      <option value={val._id} key={key}>
+                        {val.date_d + " - " + val.date_f}
                       </option>
                     );
                   })}
@@ -272,10 +296,10 @@ export default function Ajouter() {
                 <input
                   className="form-control"
                   type="number"
-                  name="name"
+                  name="nbr_plc"
                   required
-                  value={nbr_plc}
-                  onChange={(e) => setNbr_plc(e.target.value)}
+                  value={values.nbr_plc}
+                  onChange={handlechange}
                 />
               </div>
             </div>

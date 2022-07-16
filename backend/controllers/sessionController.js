@@ -1,31 +1,35 @@
-const Session = require("../models/Session");
+const SessionService = require("../services/sessionService");
 const asyncHandler = require("../middlewares/asyncMiddleware");
 
-const ajouterSession = asyncHandler(async (req, res) => {
-  const { num, date_d, date_f } = req.body;
-
-  const sessionExist = await Service.findOne({ num });
-  if (sessionExist) {
-    res.status(403);
-    throw new Error("Session Already Exist");
-  }
-  const session = new Session({ num, date_d, date_f });
-  const createdSession = await session.save();
-
-  if (createdSession) {
-    res.json({
-      num: createdSession.num,
-      date_d: createdSession.date_d,
-      date_f: createdSession.date_f,
+const configSession = asyncHandler(async (req, res, next) => {
+  const { debut, end, interval } = req.body;
+  const parseDMY = (s) => {
+    let [d, m, y] = s.split(/\D/);
+    return new Date(y, m - 1, d);
+  };
+  try {
+    const sessions = await SessionService.configSession(
+      parseDMY(debut),
+      parseDMY(end),
+      interval
+    );
+    res.status(200).json({
+      sessions: sessions,
+      action: `Sessions Created from ${debut} to ${end} with an intervalle of ${interval} days `,
     });
-  } else {
-    res.status(400);
-    throw new Error("Error Occured");
+  } catch (error) {
+    next(error);
   }
 });
-const getSessions = asyncHandler(async (req, res) => {
-  const sessions = await Session.find();
-  res.json({ sessions });
+const getSessions = asyncHandler(async (req, res, next) => {
+  try {
+    const sessions = await SessionService.getSessions();
+    res.status(200).json({
+      sessions: sessions,
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
-module.exports = { ajouterSession, getSessions };
+module.exports = { configSession, getSessions };

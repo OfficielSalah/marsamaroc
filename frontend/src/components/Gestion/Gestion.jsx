@@ -9,7 +9,6 @@ import ErrorMessage from "../errorMessage";
 import "./Gestion.css";
 
 export default function Gestion() {
-  const [user, setUser] = useState("");
   const [users, setUsers] = useState([]);
   const [demandes, setDemandes] = useState([]);
   const [data, setData] = useState([]);
@@ -17,8 +16,8 @@ export default function Gestion() {
   const [loading, setLoading] = useState(null);
   const [count, setCount] = useState(0);
   const navigate = useNavigate();
-
-  const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
+  const userInfo = localStorage.getItem("userInfo");
+  const token = JSON.parse(userInfo)?.token;
   const config = {
     headers: {
       "Content-type": "application/json",
@@ -26,9 +25,9 @@ export default function Gestion() {
     },
   };
 
-  const getdata = () => {
+  const getdata = async () => {
     setLoading(true);
-    axios.get("/api/demandes/employe", config).then((response) => {
+    await axios.get("/api/demandes/employe", config).then((response) => {
       setUsers(response.data.users);
       setDemandes(response.data.demandes);
       let items = demandes.map((_id, index) => {
@@ -44,27 +43,25 @@ export default function Gestion() {
   };
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
     if (!userInfo) {
       navigate("/login");
     }
-    setUser(JSON.parse(localStorage.getItem("userInfo")));
     if (data.length === 0 && count < 5) {
       getdata();
     }
-  }, [data]);
+  }, [count]);
 
   const submit = async (id) => {
     try {
       setLoading(true);
       await axios.put(
-        `/api/demandes/${id}`,
-        { isvalid: true, ischecked: true },
+        `/api/demandes/validate/${id}`,
+        { isvalid: true },
         config
       );
       setLoading(false);
     } catch (error) {
-      setError(error.response.data.message);
+      setError(error.response.data.error);
       setLoading(false);
     }
   };
@@ -73,20 +70,20 @@ export default function Gestion() {
       setLoading(true);
 
       await axios.put(
-        `/api/demandes/${id}`,
-        { isvalid: false, ischecked: true },
+        `/api/demandes/validate/${id}`,
+        { isvalid: false },
         config
       );
       setLoading(false);
     } catch (error) {
-      setError(error.response.data.message);
+      setError(error.response.data.error);
       setLoading(false);
     }
   };
 
   return (
     <div className="home">
-      <Sidebar login={user.login} />
+      <Sidebar />
       <div className="employe">
         <h1 className="gestion">Gestion Demande</h1>
         {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
@@ -151,7 +148,7 @@ export default function Gestion() {
                                         </div>
                                       </td>
                                       <td>{val.user.matricule}</td>
-                                      <td>{val.user.service}</td>
+                                      <td>{val.user.ser_Id}</td>
                                       <td>{val.user.date_emb}</td>
                                       <td>{val.user.category}</td>
                                       <td>{val.user.stf}</td>
@@ -188,11 +185,17 @@ export default function Gestion() {
                                         </div>
                                       </td>
                                       <td>{val.demande.choixs[0].centre}</td>
-                                      <td>{val.demande.choixs[0].session}</td>
+                                      <td>
+                                        {val.demande.choixs[0].session_id}
+                                      </td>
                                       <td>{val.demande.choixs[1].centre}</td>
-                                      <td>{val.demande.choixs[1].session}</td>
+                                      <td>
+                                        {val.demande.choixs[1].session_id}
+                                      </td>
                                       <td>{val.demande.choixs[2].centre}</td>
-                                      <td>{val.demande.choixs[2].session}</td>
+                                      <td>
+                                        {val.demande.choixs[2].session_id}
+                                      </td>
                                       <td>{val.demande.nbr_plc}</td>
                                     </tr>
                                   </tbody>

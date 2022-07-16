@@ -4,43 +4,64 @@ import Sidebar from "../Sidebar/Sidebar";
 import axios from "axios";
 import ErrorMessage from "../errorMessage";
 import { useNavigate } from "react-router-dom";
+import Loading from "../Loading";
+import delay from "../delay";
 import "./Profile.css";
 
 export default function Profil() {
-  const [nom, setNom] = useState("");
-  const [matricule, setMatricule] = useState("");
-  const [service, setService] = useState("");
-  const [category, setCategory] = useState("");
-  const [stf, setStf] = useState("");
-  const [date_emb, setDate_emb] = useState("");
-  const [nbr_enf, setNbr_enf] = useState("");
-  const [gsm, setGsm] = useState("");
+  const [values, setValues] = useState({
+    nom: "",
+    matricule: "",
+    ser_Id: "",
+    category: "",
+    stf: "",
+    date_emb: "",
+    nbr_enf: "",
+    gsm: "",
+  });
   const [data, setData] = useState([]);
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
   const [error, setError] = useState(false);
-  const [user, setUser] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
+  const userInfo = localStorage.getItem("userInfo");
+  const token = JSON.parse(userInfo)?.token;
 
-  const token = JSON.parse(localStorage.getItem("userInfo")).token;
-  const config = {
-    headers: {
-      "Content-type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+  const redirect = async () => {
+    setVariant("success");
+    setMessage("Congratulation , You Profil Has Been Updated");
+    await delay(2000);
+    setMessage("you will be redirected to the home page after a moment ...");
+    await delay(3000);
+    navigate("/home");
+  };
+
+  const handlechange = (e) => {
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value });
   };
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
     if (!userInfo) {
       navigate("/login");
     }
-    setUser(JSON.parse(localStorage.getItem("userInfo")));
-    getdata();
-  }, []);
+    if (data.length === 0) {
+      getdata();
+    }
+    if (success) {
+      redirect();
+    }
+  }, [success]);
 
-  const getdata = () => {
-    axios.get("/api/services/", config).then((response) => {
+  const getdata = async () => {
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+    await axios.get("/api/services/", config).then((response) => {
       setData(response.data.services);
     });
   };
@@ -48,28 +69,46 @@ export default function Profil() {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
       await axios.put(
         "/api/users/profile",
-        { nom, matricule, service, category, stf, date_emb, nbr_enf, gsm },
+
+        {
+          nom: values.nom,
+          matricule: values.matricule,
+          stf: values.stf,
+          ser_Id: values.ser_Id,
+          category: values.category,
+          date_emb: values.date_emb,
+          nbr_enf: values.nbr_enf,
+          gsm: values.gsm,
+        },
         config
       );
-      setVariant("success");
-      setMessage("Congratulation , You Profil Has Been Updated");
-      setTimeout(() => {
-        navigate("/home");
-      }, 3000);
+      setLoading(false);
+      setSuccess(true);
     } catch (error) {
-      setError(error.response.data.message);
+      setLoading(false);
+      setError(error.response.data.error);
+      await delay(2000);
+      setError(null);
     }
   };
   return (
     <div className="home">
-      <Sidebar login={user.login} />
+      <Sidebar />
       <div className="profile">
         <h1 className="prof">Profil</h1>
+        {message && <ErrorMessage variant={variant}>{message}</ErrorMessage>}
+        {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
+        {loading && <Loading />}
         <form className="form" onSubmit={submitHandler}>
-          {message && <ErrorMessage variant={variant}>{message}</ErrorMessage>}
-          {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
           <div className="row button">
             <div className="col">
               <div className="form-group">
@@ -77,10 +116,10 @@ export default function Profil() {
                 <input
                   className="form-control"
                   type="text"
-                  name="name"
+                  name="nom"
                   required
-                  value={nom}
-                  onChange={(e) => setNom(e.target.value)}
+                  value={values.nom}
+                  onChange={handlechange}
                 />
               </div>
             </div>
@@ -92,8 +131,8 @@ export default function Profil() {
                   type="number"
                   name="matricule"
                   required
-                  value={matricule}
-                  onChange={(e) => setMatricule(e.target.value)}
+                  value={values.matricule}
+                  onChange={handlechange}
                 />
               </div>
             </div>
@@ -103,11 +142,11 @@ export default function Profil() {
               <div className="form-group">
                 <label>Service</label>
                 <select
-                  name="stf"
+                  name="ser_Id"
                   className="form-control"
                   required
-                  value={service}
-                  onChange={(e) => setService(e.target.value)}
+                  value={values.ser_Id}
+                  onChange={handlechange}
                 >
                   <option
                     className="form-control"
@@ -140,8 +179,8 @@ export default function Profil() {
                   name="category"
                   className="form-control"
                   required
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  value={values.category}
+                  onChange={handlechange}
                 >
                   <option
                     className="form-control"
@@ -166,8 +205,8 @@ export default function Profil() {
                   name="stf"
                   className="form-control"
                   required
-                  value={stf}
-                  onChange={(e) => setStf(e.target.value)}
+                  value={values.stf}
+                  onChange={handlechange}
                 >
                   <option type="text" value="null">
                     choisissez
@@ -187,8 +226,8 @@ export default function Profil() {
                   name="date_emb"
                   className="form-control"
                   required
-                  value={date_emb}
-                  onChange={(e) => setDate_emb(e.target.value)}
+                  value={values.date_emb}
+                  onChange={handlechange}
                 />
               </div>
             </div>
@@ -203,8 +242,8 @@ export default function Profil() {
                   type="number"
                   name="nbr_enf"
                   required
-                  value={nbr_enf}
-                  onChange={(e) => setNbr_enf(e.target.value)}
+                  value={values.nbr_enf}
+                  onChange={handlechange}
                 />
               </div>
             </div>
@@ -217,8 +256,8 @@ export default function Profil() {
                   type="text"
                   name="gsm"
                   required
-                  value={gsm}
-                  onChange={(e) => setGsm(e.target.value)}
+                  value={values.gsm}
+                  onChange={handlechange}
                 />
               </div>
             </div>

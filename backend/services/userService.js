@@ -17,8 +17,8 @@ const registerUser = async (login, email, password) => {
     throw new ErrorResponse("login or email or password not valid", 400);
   }
 
-  const userByLogin = await User.findOne({ login });
-  const userByEmail = await User.findOne({ email });
+  const userByLogin = await User.findOne({ login: login });
+  const userByEmail = await User.findOne({ email: email });
   if (userByLogin || userByEmail) {
     throw new ErrorResponse("User Already Exist", 401);
   }
@@ -55,16 +55,16 @@ const registerUser = async (login, email, password) => {
   });
   return user;
 };
-const verifyEmail = async (userId, otp) => {
-  if (!userId || !otp.trim()) {
+const verifyEmail = async (user_Id, otp) => {
+  if (!user_Id || !otp.trim()) {
     throw new ErrorResponse("userId or OTP not valid", 400);
   }
 
-  if (!isValidObjectId(userId)) {
+  if (!isValidObjectId(user_Id)) {
     throw new ErrorResponse("unvalid userId", 400);
   }
 
-  const user = await User.findById(userId);
+  const user = await User.findById(user_Id);
   if (!user) {
     throw new ErrorResponse("User Not Found", 404);
   }
@@ -93,7 +93,7 @@ const forgetPassword = async (email) => {
     throw new ErrorResponse("email not valid", 400);
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: email });
 
   if (!user) {
     throw new ErrorResponse("user Not Found", 404);
@@ -155,7 +155,7 @@ const resetPassword = async (password, id) => {
   await ResetToken.findOneAndDelete({ owner: user._id });
 };
 const authUser = async (login, password) => {
-  const user = await User.findOne({ login });
+  const user = await User.findOne({ login: login });
 
   if (!user) {
     throw new ErrorResponse("user Not Found", 404);
@@ -185,6 +185,10 @@ const updateProfile = async (
 
   if (!user) {
     throw new ErrorResponse("User Not Found", 404);
+  }
+  userByMatricule = await User.findOne({ matricule: matricule });
+  if (userByMatricule) {
+    throw new ErrorResponse("Matricule Already Used", 401);
   }
 
   user.nom = nom || user.nom;

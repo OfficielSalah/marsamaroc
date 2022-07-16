@@ -1,11 +1,9 @@
 const express = require("express");
-const {
-  ajouterService,
-  getServices,
-} = require("../controllers/serviceController");
+const ServiceController = require("../controllers/serviceController");
 
 const router = express.Router();
-router.route("/").get(getServices);
-router.route("/ajouter").post(ajouterService);
+
+router.route("/").get(ServiceController.getServices);
+router.route("/ajouter").post(ServiceController.ajouterService);
 
 module.exports = router;

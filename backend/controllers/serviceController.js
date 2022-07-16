@@ -1,31 +1,35 @@
-const Service = require("../models/Service");
+const ServiceService = require("../services/serviceService");
 const asyncHandler = require("../middlewares/asyncMiddleware");
 
-const ajouterService = asyncHandler(async (req, res) => {
-  const { ser_nom, ser_code, chef_id } = req.body;
+const ajouterService = asyncHandler(async (req, res, next) => {
+  const { ser_nom, ser_code, chef_mat } = req.body;
 
-  const serviceExist = await Service.findOne({ ser_code });
-  if (serviceExist) {
-    res.status(403);
-    throw new Error("Service Already Exist");
-  }
-  const service = new Service({ ser_code, ser_nom, chef_id });
-  const createdService = await service.save();
-
-  if (createdService) {
-    res.json({
-      ser_nom: createdService.ser_nom,
-      ser_code: createdService.ser_code,
-      chef_id: createdService.chef_id,
+  try {
+    const service = await ServiceService.ajouterService(
+      ser_nom,
+      ser_code,
+      chef_mat
+    );
+    res.status(200).json({
+      _id: service._id,
+      ser_nom: service.ser_nom,
+      ser_code: service.ser_code,
+      chef_mat: service.chef_mat,
+      action: "Service Created",
     });
-  } else {
-    res.status(400);
-    throw new Error("Error Occured");
+  } catch (error) {
+    next(error);
   }
 });
-const getServices = asyncHandler(async (req, res) => {
-  const services = await Service.find();
-  res.json({ services });
+const getServices = asyncHandler(async (req, res, next) => {
+  try {
+    const services = await ServiceService.getServices();
+    res.status(200).json({
+      services: services,
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = { ajouterService, getServices };

@@ -7,38 +7,38 @@ import Loading from "../Loading";
 import "./Historique.css";
 
 export default function Historique() {
-  const [user, setUser] = useState("");
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const token = JSON.parse(localStorage.getItem("userInfo")).token;
-  const config = {
-    headers: {
-      "Content-type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  };
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const userInfo = localStorage.getItem("userInfo");
+  const token = JSON.parse(userInfo)?.token;
 
-  useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
-    if (!userInfo) {
-      navigate("/login");
-    }
-    setUser(JSON.parse(localStorage.getItem("userInfo")));
-    getdata();
-  }, []);
-
-  const getdata = () => {
+  const getdata = async () => {
     setLoading(true);
-    axios.get("/api/demandes/", config).then((response) => {
-      setData(response.data.data);
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    await axios.get("/api/demandes/", config).then((response) => {
+      setData(response.data.demandes);
       setLoading(false);
     });
   };
+
+  useEffect(() => {
+    if (!userInfo) {
+      navigate("/login");
+    }
+    if (data.length === 0) {
+      getdata();
+    }
+  }, []);
+
   return (
     <div className="home">
-      <Sidebar login={user.login} />
+      <Sidebar />
       <div className="historique">
         <h1 className="history">Historique</h1>
         <div className="container-fluid mt-5">
@@ -61,7 +61,6 @@ export default function Historique() {
                         <th>Centre Vacance 3</th>
                         <th>Session 3</th>
                         <th>nombre de place</th>
-                        <th>date</th>
                       </tr>
                     </thead>
                     {data?.map((val, key) => {
@@ -74,13 +73,12 @@ export default function Historique() {
                               </div>
                             </td>
                             <td>{val.choixs[0].centre}</td>
-                            <td>{val.choixs[0].session}</td>
+                            <td>{val.choixs[0].session_id}</td>
                             <td>{val.choixs[1].centre}</td>
-                            <td>{val.choixs[1].session}</td>
+                            <td>{val.choixs[1].session_id}</td>
                             <td>{val.choixs[2].centre}</td>
-                            <td>{val.choixs[2].session}</td>
+                            <td>{val.choixs[2].session_id}</td>
                             <td>{val.nbr_plc}</td>
-                            <td>{val.date}</td>
                           </tr>
                         </tbody>
                       );

@@ -5,19 +5,26 @@ import axios from "axios";
 import "./Login.css";
 import Loading from "../Loading";
 import ErrorMessage from "../errorMessage";
+import delay from "../delay";
 
 export default function Login() {
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
+  const [values, setValues] = useState({
+    login: "",
+    password: "",
+  });
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState("");
-  const pass = JSON.parse(localStorage.getItem("userInfo"));
-
+  const userParsed = JSON.parse(localStorage.getItem("userInfo"));
   const navigate = useNavigate();
 
+  const handlechange = (e) => {
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value });
+  };
+
   useEffect(() => {
-    if (pass?.isverified) {
+    if (userParsed?.isverified) {
       navigate("/home");
     }
     if (data) {
@@ -41,14 +48,16 @@ export default function Login() {
       };
       const { data } = await axios.post(
         "/api/users/login",
-        { login, password },
+        { login: values.login, password: values.password },
         config
       );
       setData(data);
       setLoading(false);
     } catch (error) {
-      setError(error.response.data.message);
       setLoading(false);
+      setError(error.response.data.error);
+      await delay(3000);
+      setError(null);
     }
   };
 
@@ -65,8 +74,8 @@ export default function Login() {
             type="text"
             name="login"
             required
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
+            value={values.login}
+            onChange={handlechange}
           />
         </p>
         <p>
@@ -78,10 +87,9 @@ export default function Login() {
           <input
             type="password"
             name="password"
-            autoComplete="true"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={values.password}
+            onChange={handlechange}
           />
         </p>
         <p>

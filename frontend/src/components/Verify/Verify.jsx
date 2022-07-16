@@ -5,6 +5,7 @@ import axios from "axios";
 import "./Verify.css";
 import Loading from "../Loading";
 import ErrorMessage from "../errorMessage";
+import delay from "../delay";
 
 export default function Verify() {
   const [otp, setOtp] = useState("");
@@ -13,18 +14,10 @@ export default function Verify() {
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
-  const pass = JSON.parse(localStorage.getItem("userInfo"));
-  const user = JSON.parse(localStorage.getItem("registerInfo"));
-  const userId = user?._id;
+  const userParsed = JSON.parse(localStorage.getItem("userInfo"));
+  const registerParsed = JSON.parse(localStorage.getItem("registerInfo"));
+  const user_Id = registerParsed?._id;
   const navigate = useNavigate();
-
-  function delay(s) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(2);
-      }, s);
-    });
-  }
 
   const redirect = async () => {
     setVariant("success");
@@ -36,7 +29,7 @@ export default function Verify() {
   };
 
   useEffect(() => {
-    if (pass?.isverified) {
+    if (userParsed?.isverified) {
       navigate("/home");
     }
     if (success) {
@@ -51,17 +44,15 @@ export default function Verify() {
       const config = {
         headers: { "Content-type": "application/json" },
       };
-      const { data } = await axios.post(
-        "/api/users/verify-email",
-        { userId, otp },
-        config
-      );
+      await axios.post("/api/users/verify-email", { user_Id, otp }, config);
       localStorage.removeItem("registerInfo");
+      setLoading(false);
       setSuccess(true);
-      setLoading(false);
     } catch (error) {
-      setError(error.response.data.message);
       setLoading(false);
+      setError(error.response.data.error);
+      await delay(3000);
+      setError(null);
     }
   };
 

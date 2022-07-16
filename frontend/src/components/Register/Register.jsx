@@ -4,28 +4,23 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loading from "../Loading";
 import ErrorMessage from "../errorMessage";
+import delay from "../delay";
 import "./Register.css";
 
 export default function Register() {
-  const [login, setLogin] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmepassword, setConfirmepassword] = useState("");
+  const [values, setValues] = useState({
+    login: "",
+    email: "",
+    password: "",
+    confirmepassword: "",
+  });
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const pass = JSON.parse(localStorage.getItem("userInfo"));
-
+  const userParsed = JSON.parse(localStorage.getItem("userInfo"));
+  const registerInfo = localStorage.getItem("registerInfo");
   const navigate = useNavigate();
-
-  function delay(s) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(2);
-      }, s);
-    });
-  }
 
   const redirect = async () => {
     setVariant("success");
@@ -40,11 +35,16 @@ export default function Register() {
     navigate("/verify-email");
   };
 
+  const handlechange = (e) => {
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value });
+  };
+
   useEffect(() => {
-    if (pass?.isverified) {
+    if (userParsed?.isverified) {
       navigate("/home");
     }
-    const registerInfo = localStorage.getItem("registerInfo");
+
     if (registerInfo) {
       redirect();
     }
@@ -53,9 +53,10 @@ export default function Register() {
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmepassword) {
-      setVariant("danger");
-      setMessage("Password does not match !");
+    if (values.password !== values.confirmepassword) {
+      setError("Password does not match !");
+      await delay(3000);
+      setError(null);
     } else {
       try {
         setLoading(true);
@@ -64,14 +65,20 @@ export default function Register() {
         };
         const { data } = await axios.post(
           "/api/users/register",
-          { login, password, email },
+          {
+            login: values.login,
+            password: values.password,
+            email: values.email,
+          },
           config
         );
         localStorage.setItem("registerInfo", JSON.stringify(data));
         setLoading(false);
       } catch (error) {
-        setError(error.response.data.message);
+        setError(error.response.data.error);
         setLoading(false);
+        await delay(3000);
+        setError(null);
       }
     }
   };
@@ -91,8 +98,8 @@ export default function Register() {
             type="text"
             name="login"
             required
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
+            value={values.login}
+            onChange={handlechange}
           />
         </p>
         <p>
@@ -102,8 +109,8 @@ export default function Register() {
             type="email"
             name="email"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={values.email}
+            onChange={handlechange}
           />
         </p>
         <p>
@@ -113,8 +120,8 @@ export default function Register() {
             type="password"
             name="password"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={values.password}
+            onChange={handlechange}
           />
         </p>
         <p>
@@ -122,10 +129,10 @@ export default function Register() {
           <br />
           <input
             type="password"
-            name="password"
+            name="confirmepassword"
             required
-            value={confirmepassword}
-            onChange={(e) => setConfirmepassword(e.target.value)}
+            value={values.confirmepassword}
+            onChange={handlechange}
           />
         </p>
         <p>

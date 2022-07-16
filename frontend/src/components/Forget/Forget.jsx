@@ -5,6 +5,7 @@ import axios from "axios";
 import Loading from "../Loading";
 import ErrorMessage from "../errorMessage";
 import { useNavigate } from "react-router-dom";
+import delay from "../delay";
 import "./Forget.css";
 
 export default function Forget() {
@@ -13,11 +14,11 @@ export default function Forget() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
-  const pass = JSON.parse(localStorage.getItem("userInfo"));
+  const userParsed = JSON.parse(localStorage.getItem("userInfo"));
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (pass?.isverified) {
+    if (userParsed?.isverified) {
       navigate("/home");
     }
   }, []);
@@ -25,17 +26,19 @@ export default function Forget() {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const config = {
         headers: { "Content-type": "application/json" },
       };
-      setLoading(true);
       await axios.post("/api/users/forget-password", { email }, config);
       setLoading(false);
       setVariant("success");
       setMessage("Password reset link is sent to your email");
     } catch (error) {
-      setError(error.response.data.message);
       setLoading(false);
+      setError(error.response.data.error);
+      await delay(3000);
+      setError(null);
     }
   };
   return (

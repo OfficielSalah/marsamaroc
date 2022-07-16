@@ -5,31 +5,38 @@ import axios from "axios";
 import "./Reset.css";
 import ErrorMessage from "../errorMessage";
 import queryString from "query-string";
+import delay from "../delay";
 
 export default function Reset() {
-  const [password, setPassword] = useState("");
-  const [confirmepassword, setConfirmepassword] = useState("");
+  const [values, setValues] = useState({
+    password: "",
+    confirmepassword: "",
+  });
   const [error, setError] = useState(false);
   const [message, setMessage] = useState(null);
   const [variant, setVariant] = useState(null);
   const location = useLocation();
-  const pass = JSON.parse(localStorage.getItem("userInfo"));
-  const navigate = useNavigate();
+  const userParsed = JSON.parse(localStorage.getItem("userInfo"));
   const { token, id } = queryString.parse(location.search);
+  const navigate = useNavigate();
+
+  const handlechange = (e) => {
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value });
+  };
 
   const verifyToken = async () => {
     try {
       await axios.get(`/api/users/verify-token?token=${token}&id=${id}`);
     } catch (error) {
-      if (error?.response?.data) {
-        return console.log(error.response.data);
-      }
-      console.log(error);
+      setError(error.response.data.error);
+      await delay(3000);
+      setError(null);
     }
   };
 
   useEffect(() => {
-    if (pass?.isverified) {
+    if (userParsed?.isverified) {
       navigate("/home");
     }
     verifyToken();
@@ -37,14 +44,14 @@ export default function Reset() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    if (password !== confirmepassword) {
+    if (values.password !== values.confirmepassword) {
       setVariant("danger");
       setMessage("Password does not match !");
     } else {
       try {
         const { data } = await axios.post(
           `/api/users/reset-password?token=${token}&id=${id}`,
-          { password }
+          { password: values.password }
         );
         if (data.success) {
           setVariant("success");
@@ -74,8 +81,8 @@ export default function Reset() {
             type="password"
             name="password"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={values.password}
+            onChange={handlechange}
           />
         </p>
         <p>
@@ -85,8 +92,8 @@ export default function Reset() {
             type="password"
             name="confirmepassword"
             required
-            value={confirmepassword}
-            onChange={(e) => setConfirmepassword(e.target.value)}
+            value={values.confirmepassword}
+            onChange={handlechange}
           />
         </p>
         <p>

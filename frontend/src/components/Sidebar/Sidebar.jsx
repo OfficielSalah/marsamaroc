@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import "./Sidebar.css";
 
-function Sidebar(props) {
+export default function Sidebar() {
+  const userParsed = JSON.parse(localStorage.getItem("userInfo"));
   const navigate = useNavigate();
   return (
     <div className="sidebar">
@@ -16,7 +17,7 @@ function Sidebar(props) {
           </span>
         </div>
       </header>
-      <div className="login">{props.login}</div>
+      <div className="login">{userParsed.login}</div>
       <ul className="sidelist">
         {sidebarData.map((val, key) => {
           return (
@@ -48,5 +49,3 @@ function Sidebar(props) {
     </div>
   );
 }
-
-export default Sidebar;

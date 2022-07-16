@@ -59,9 +59,9 @@ const registerUser = asyncHandler(async (req, res, next) => {
 });
 
 const verifyEmail = asyncHandler(async (req, res, next) => {
-  const { userId, otp } = req.body;
+  const { user_Id, otp } = req.body;
   try {
-    const user = await UserService.verifyEmail(userId, otp);
+    const user = await UserService.verifyEmail(user_Id, otp);
     res.status(200).json({
       _id: user._id,
       isverified: user.isverified,
