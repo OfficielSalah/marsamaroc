@@ -50,8 +50,7 @@ const getDemandesemploye = asyncHandler(async (req, res, next) => {
   try {
     const data = await DemandeService.getDemandesemploye(user_id);
     res.status(200).json({
-      demandes: data.demandes,
-      users: data.users,
+      demsemp: data.demsemp,
     });
   } catch (error) {
     next(error);

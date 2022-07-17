@@ -9,8 +9,6 @@ import ErrorMessage from "../errorMessage";
 import "./Gestion.css";
 
 export default function Gestion() {
-  const [users, setUsers] = useState([]);
-  const [demandes, setDemandes] = useState([]);
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(null);
@@ -27,16 +25,8 @@ export default function Gestion() {
 
   const getdata = async () => {
     setLoading(true);
-    await axios.get("/api/demandes/employe", config).then((response) => {
-      setUsers(response.data.users);
-      setDemandes(response.data.demandes);
-      let items = demandes.map((_id, index) => {
-        return {
-          demande: demandes[index],
-          user: users[index],
-        };
-      });
-      setData(items);
+    await axios.get("/api/demandes/employe", config).then((res) => {
+      setData(res.data.demsemp);
       setCount(count + 1);
       setLoading(false);
     });
@@ -51,27 +41,12 @@ export default function Gestion() {
     }
   }, [count]);
 
-  const submit = async (id) => {
+  const handle = async (id, isvalid) => {
     try {
       setLoading(true);
       await axios.put(
         `/api/demandes/validate/${id}`,
-        { isvalid: true },
-        config
-      );
-      setLoading(false);
-    } catch (error) {
-      setError(error.response.data.error);
-      setLoading(false);
-    }
-  };
-  const annuler = async (id) => {
-    try {
-      setLoading(true);
-
-      await axios.put(
-        `/api/demandes/validate/${id}`,
-        { isvalid: false },
+        { isvalid: isvalid },
         config
       );
       setLoading(false);
@@ -93,7 +68,7 @@ export default function Gestion() {
             <div className="col-lg-12">
               <div className="rounded">
                 <Accordion>
-                  {data?.map((val, key) => {
+                  {data.map((val, key) => {
                     return (
                       <Accordion.Item eventKey={key} key={key}>
                         <Card style={{ margin: 10 }}>
@@ -106,7 +81,7 @@ export default function Gestion() {
                             <Button
                               variant="success"
                               onClick={() => {
-                                submit(val.demande._id);
+                                handle(val.demande._id, true);
                               }}
                             >
                               Valider
@@ -114,7 +89,7 @@ export default function Gestion() {
                             <Button
                               variant="danger"
                               className="mx-2"
-                              onClick={() => annuler(val.demande._id)}
+                              onClick={() => handle(val.demande._id, false)}
                             >
                               Annuler
                             </Button>

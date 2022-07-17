@@ -123,8 +123,12 @@ const getDemandesemploye = async (user_id) => {
     nbr_enf: user.nbr_enf,
     gsm: user.gsm,
   }));
+  let demsemp = demandes.map((demande, index) => ({
+    demande: demande,
+    user: users[index],
+  }));
 
-  return { demandes, users };
+  return { demsemp };
 };
 const validateDemande = async (dem_id, isvalid) => {
   if (!dem_id || isvalid === undefined) {
