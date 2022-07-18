@@ -53,7 +53,7 @@ export default function Ajouter() {
     if (success) {
       redirect();
     }
-  }, [success]);
+  }, [success, data]);
 
   const getdata = async () => {
     const config = {

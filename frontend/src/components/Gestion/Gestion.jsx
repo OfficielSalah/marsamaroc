@@ -12,7 +12,6 @@ export default function Gestion() {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(null);
-  const [count, setCount] = useState(0);
   const navigate = useNavigate();
   const userInfo = localStorage.getItem("userInfo");
   const token = JSON.parse(userInfo)?.token;
@@ -27,19 +26,18 @@ export default function Gestion() {
     setLoading(true);
     await axios.get("/api/demandes/employe", config).then((res) => {
       setData(res.data.demsemp);
-      setCount(count + 1);
-      setLoading(false);
     });
+    setLoading(false);
   };
 
   useEffect(() => {
     if (!userInfo) {
       navigate("/login");
     }
-    if (data.length === 0 && count < 5) {
+    if (data.length === 0) {
       getdata();
     }
-  }, [count]);
+  }, []);
 
   const handle = async (id, isvalid) => {
     try {

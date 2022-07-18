@@ -22,7 +22,7 @@ const isResetTokenValid = asyncHandler(async (req, res, next) => {
     throw new Error("user not found");
   }
 
-  resettoken = await ResetToken.findOne({ owner: user._id });
+  const resettoken = await ResetToken.findOne({ owner: user._id });
 
   if (!resettoken) {
     res.status(403);
