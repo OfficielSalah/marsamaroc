@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import Sidebar from "../Sidebar/Sidebar";
+import Sidebar from "../../layout/Sidebar/Sidebar";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 

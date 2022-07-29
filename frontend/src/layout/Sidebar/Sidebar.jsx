@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../../images/marsa-sidebar.png";
+import logo from "../../assets/images/marsa-sidebar.png";
 import { sidebarData } from "./sidebarData";
 import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";

@@ -1,0 +1,24 @@
+.right-label {
+  float: right;
+  cursor: pointer;
+}
+
+#sub_btn {
+  display: block;
+  width: 100%;
+  padding: 0.3rem;
+  border: none;
+  background: #222;
+  color: #fff;
+  border-radius: 3px;
+}
+
+#sub_btn:hover {
+  background: #333;
+  transition: all 0.5s;
+}
+
+footer p {
+  margin: 0;
+  font-size: 0.9rem;
+}

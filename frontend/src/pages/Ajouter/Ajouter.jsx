@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import Sidebar from "../Sidebar/Sidebar";
+import Sidebar from "../../layout/Sidebar/Sidebar";
 import axios from "axios";
 import ErrorMessage from "../errorMessage";
 import { useNavigate } from "react-router-dom";

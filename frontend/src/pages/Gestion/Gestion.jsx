@@ -3,7 +3,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { Accordion, Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../Sidebar/Sidebar";
+import Sidebar from "../../layout/Sidebar/Sidebar";
 import Loading from "../Loading";
 import ErrorMessage from "../errorMessage";
 import "./Gestion.css";

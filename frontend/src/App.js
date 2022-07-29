@@ -1,18 +1,22 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
-import Landing from "./components/Landing/Landing";
-import Login from "./components/Login/Login";
-import Register from "./components/Register/Register";
-import Forget from "./components/Forget/Forget";
-import Reset from "./components/Reset/Reset";
-import Home from "./components/Home/Home";
-import Profile from "./components/Profile/Profile.jsx";
-import Ajouter from "./components/Ajouter/Ajouter";
-import Historique from "./components/Historique/Historique";
-import Gestion from "./components/Gestion/Gestion";
-import Verify from "./components/Verify/Verify";
-import "./App.css";
+import Landing from "./pages/Landing/Landing";
+import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
+import Forget from "./pages/Forget/Forget";
+import Reset from "./pages/Reset/Reset";
+import Home from "./pages/Home/Home";
+import Profile from "./pages/Profile/Profile.jsx";
+import Ajouter from "./pages/Ajouter/Ajouter";
+import Historique from "./pages/Historique/Historique";
+import Gestion from "./pages/Gestion/Gestion";
+import Verify from "./pages/Verify/Verify";
 
 export default function App() {
   return (
