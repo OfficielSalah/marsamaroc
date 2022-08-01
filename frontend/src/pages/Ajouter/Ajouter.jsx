@@ -2,10 +2,9 @@ import React from "react";
 import { useState, useEffect } from "react";
 import Sidebar from "../../layout/Sidebar/Sidebar";
 import axios from "axios";
-import ErrorMessage from "../errorMessage";
 import { useNavigate } from "react-router-dom";
 import Loading from "../Loading";
-import delay from "../delay";
+import delay from "../../helpers/delay";
 import "./Ajouter.css";
 
 export default function Ajouter() {
@@ -102,8 +101,6 @@ export default function Ajouter() {
         <h1 className="demande">Ajouter Demande</h1>
         <form className="forme" onSubmit={submitHandler}>
           {loading && <Loading />}
-          {message && <ErrorMessage variant={variant}>{message}</ErrorMessage>}
-          {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
           <div className="row button">
             <div className="col">
               <div className="form-group">

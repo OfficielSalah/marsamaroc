@@ -1,0 +1,141 @@
+body {
+  overflow: hidden;
+}
+.screen {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #3b3d3c;
+}
+.box {
+  position: relative;
+  max-width: 1020px;
+  height: 636px;
+  width: 100%;
+  border-radius: 3.3rem;
+  background: white;
+  box-shadow: 0px 6px 6px 5px rgba(0, 0, 0, 0.4);
+}
+.inner_box {
+  position: absolute;
+  width: calc(100% - 4.1rem);
+  height: calc(100% - 4.1rem);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.forms_wrap {
+  position: absolute;
+  height: 100%;
+  width: 45%;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  transition: 0.8s ease-in-out;
+}
+
+.forms_wrap form {
+  max-width: 260px;
+  width: 100%;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  transition: opacity 0.02s 0.4s;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo img {
+  width: 180px;
+}
+.heading h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+.heading h6 {
+  color: #bababa;
+  font-size: 0.75rem;
+  font-weight: 400;
+  display: inline;
+  margin-right: 10px;
+}
+.no_decoration {
+  text-decoration: none;
+}
+.toggle {
+  color: #d12a21;
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.toggle:hover {
+  color: black;
+}
+.forget {
+  margin-left: 60%;
+}
+
+@media (max-width: 850px) {
+  body {
+    overflow: scroll;
+  }
+  .box {
+    height: auto;
+    max-width: 550px;
+    overflow: hidden;
+  }
+
+  .inner_box {
+    position: static;
+    transform: none;
+    width: revert;
+    height: revert;
+    padding: 2rem;
+  }
+
+  .forms_wrap {
+    position: revert;
+    width: 100%;
+    height: auto;
+  }
+
+  .forms_wrap form {
+    max-width: revert;
+    padding: 1.5rem 0rem 1rem;
+    transition: transform 0.8s ease-in-out, opacity 0.45s linear;
+  }
+
+  .heading {
+    margin: 2rem 0;
+  }
+}
+
+@media (max-width: 530px) {
+  body {
+    overflow: scroll;
+  }
+  .box {
+    border-radius: 2rem;
+  }
+
+  .inner_box {
+    padding: 1rem;
+  }
+  .forget {
+    margin-bottom: 1rem;
+  }
+  .forms_wrap form {
+    padding: 1rem 0rem 1.5rem;
+  }
+}

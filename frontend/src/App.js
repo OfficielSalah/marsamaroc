@@ -6,7 +6,6 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import Landing from "./pages/Landing/Landing";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Forget from "./pages/Forget/Forget";
@@ -17,12 +16,14 @@ import Ajouter from "./pages/Ajouter/Ajouter";
 import Historique from "./pages/Historique/Historique";
 import Gestion from "./pages/Gestion/Gestion";
 import Verify from "./pages/Verify/Verify";
+import Lab from "./pages/Lab/Lab";
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route exact path="/" element={<Landing />} />
+        <Route exact path="/" element={<Navigate to="/login" />} />
+        <Route exact path="/test" element={<Lab />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<Verify />} />
         <Route path="/login" element={<Login />} />

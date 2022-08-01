@@ -1,14 +1,13 @@
 import axios from "axios";
 import React from "react";
 import { useState, useEffect } from "react";
-import { Accordion, Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../layout/Sidebar/Sidebar";
 import Loading from "../Loading";
-import ErrorMessage from "../errorMessage";
 import "./Gestion.css";
 
 export default function Gestion() {
+  /*
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(null);
@@ -187,5 +186,5 @@ export default function Gestion() {
         </div>
       </div>
     </div>
-  );
+  );*/
 }

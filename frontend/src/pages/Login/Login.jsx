@@ -1,111 +1,171 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./Login.css";
-import Loading from "../Loading";
-import ErrorMessage from "../errorMessage";
-import delay from "../delay";
 
-export default function Login() {
+import Marsa from "../../assets/images/marsa-email.png";
+import Notification from "../../components/Notification";
+import styles from "./Login.module.css";
+import Carousel from "../../layout/Carousel/Carousel";
+
+import {
+  InputAdornment,
+  IconButton,
+  FormControl,
+  InputLabel,
+  Input,
+  Button,
+} from "@mui/material";
+import { VisibilityOff, Visibility, AccountCircle } from "@mui/icons-material";
+
+export default function Landing() {
   const [values, setValues] = useState({
     login: "",
     password: "",
+    showPassword: false,
+    isOpen: false,
+    message: "",
+    success: false,
+    severity: "",
+    data: "",
   });
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState("");
   const userParsed = JSON.parse(localStorage.getItem("userInfo"));
+  const config = {
+    headers: { "Content-type": "application/json" },
+  };
   const navigate = useNavigate();
 
-  const handlechange = (e) => {
-    const { name, value } = e.target;
-    setValues({ ...values, [name]: value });
-  };
-
   useEffect(() => {
-    if (userParsed?.isverified) {
+    if (userParsed) {
       navigate("/home");
     }
-    if (data) {
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      let user = JSON.parse(JSON.stringify(data));
-      if (user.isverified) {
-        navigate("/home");
-      } else {
-        localStorage.removeItem("userInfo");
-        setError("Your Account is not yet Verified");
-      }
+    if (values.data) {
+      localStorage.setItem("userInfo", JSON.stringify(values.data));
+      navigate("/home");
     }
-  }, [loading]);
+  }, [values.success]);
+
+  const handleClose = () => {
+    setValues({ ...values, isOpen: false });
+  };
+
+  const handleChange = (prop) => (event) => {
+    setValues({ ...values, [prop]: event.target.value });
+  };
+
+  const handleClickShowPassword = () => {
+    setValues({
+      ...values,
+      showPassword: !values.showPassword,
+    });
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
-      const config = {
-        headers: { "Content-type": "application/json" },
-      };
       const { data } = await axios.post(
         "/api/users/login",
         { login: values.login, password: values.password },
         config
       );
-      setData(data);
-      setLoading(false);
+      setValues({ ...values, data: data, success: true });
     } catch (error) {
-      setLoading(false);
-      setError(error.response.data.error);
-      await delay(3000);
-      setError(null);
+      setValues({
+        ...values,
+        message: error.response.data.error,
+        isOpen: true,
+        severity: "error",
+      });
     }
   };
 
   return (
-    <div className="text-center m-5-auto">
-      <h2>Se Connecter</h2>
-      {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
-      {loading && <Loading />}
-      <form onSubmit={submitHandler}>
-        <p>
-          <label>Identifiant</label>
-          <br />
-          <input
-            type="text"
-            name="login"
-            required
-            value={values.login}
-            onChange={handlechange}
-          />
-        </p>
-        <p>
-          <label>Mot De Passe</label>
-          <Link to="/forget-password">
-            <label className="right-label">Mot de Passe Oublié?</label>
-          </Link>
-          <br />
-          <input
-            type="password"
-            name="password"
-            required
-            value={values.password}
-            onChange={handlechange}
-          />
-        </p>
-        <p>
-          <button id="sub_btn" type="submit">
-            Se Connecter
-          </button>
-        </p>
-      </form>
-      <footer>
-        <p>
-          Premiére Fois? <Link to="/register">Crée un Compte</Link>.
-        </p>
-        <p>
-          <Link to="/">Back to Homepage</Link>.
-        </p>
-      </footer>
+    <div className={styles.screen}>
+      <div className={styles.box}>
+        <div className={styles.inner_box}>
+          <div className={styles.forms_wrap}>
+            <form onSubmit={submitHandler}>
+              <div className={styles.logo}>
+                <img src={Marsa} alt="Logo" />
+              </div>
+              <div className={styles.heading}>
+                <h2>Se Connecter</h2>
+                <h6>Vous n'avez pas de compte ?</h6>
+                <Link to="/register" className={styles.no_decoration}>
+                  <span className={styles.toggle}>Inscrivez-vous !</span>
+                </Link>
+              </div>
+              <FormControl variant="standard">
+                <InputLabel htmlFor="login">Login</InputLabel>
+                <Input
+                  required
+                  id="login"
+                  type="text"
+                  value={values.login}
+                  onChange={handleChange("login")}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <AccountCircle />
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+              <FormControl variant="standard">
+                <InputLabel htmlFor="password">Mot De Passe</InputLabel>
+                <Input
+                  required
+                  id="password"
+                  type={values.showPassword ? "text" : "password"}
+                  value={values.password}
+                  onChange={handleChange("password")}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                      >
+                        {values.showPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+              <Link
+                to="/forget-password"
+                className={styles.no_decoration + " " + styles.forget}
+              >
+                <span className={styles.toggle}>Forget Password?</span>
+              </Link>
+              <Button
+                variant="contained"
+                color="error"
+                type="submit"
+                sx={{
+                  borderRadius: 4,
+                  "&:hover": { backgroundColor: "#3b3d3c" },
+                }}
+              >
+                Se Connecter
+              </Button>
+            </form>
+          </div>
+          <Carousel />
+        </div>
+      </div>
+      <Notification
+        severity={values.severity}
+        message={values.message}
+        isOpen={values.isOpen}
+        onClose={handleClose}
+      />
     </div>
   );
 }

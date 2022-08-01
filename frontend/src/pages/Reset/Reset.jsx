@@ -1,107 +1,223 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import "./Reset.css";
-import ErrorMessage from "../errorMessage";
 import queryString from "query-string";
-import delay from "../delay";
+import delay from "../../helpers/delay";
+
+import Marsa from "../../assets/images/marsa-email.png";
+import Notification from "../../components/Notification";
+import styles from "./Reset.module.css";
+import Carousel from "../../layout/Carousel/Carousel";
+
+import {
+  InputAdornment,
+  FormControl,
+  IconButton,
+  InputLabel,
+  Input,
+  Button,
+} from "@mui/material";
+import { VisibilityOff, Visibility, ArrowBack } from "@mui/icons-material";
 
 export default function Reset() {
   const [values, setValues] = useState({
     password: "",
     confirmepassword: "",
+    isOpen: false,
+    message: "",
+    success: false,
+    showPassword: false,
+    data: "",
+    severity: "",
   });
-  const [error, setError] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [variant, setVariant] = useState(null);
   const location = useLocation();
-  const userParsed = JSON.parse(localStorage.getItem("userInfo"));
   const { token, id } = queryString.parse(location.search);
-  const navigate = useNavigate();
-
-  const handlechange = (e) => {
-    const { name, value } = e.target;
-    setValues({ ...values, [name]: value });
+  const config = {
+    headers: { "Content-type": "application/json" },
   };
+  const navigate = useNavigate();
 
   const verifyToken = async () => {
     try {
-      await axios.get(`/api/users/verify-token?token=${token}&id=${id}`);
+      await axios.get(
+        `/api/users/verify-token?token=${token}&id=${id}`,
+        config
+      );
     } catch (error) {
-      setError(error.response.data.error);
-      await delay(3000);
-      setError(null);
+      setValues({
+        ...values,
+        message: error.response.data.error,
+        isOpen: true,
+        severity: "error",
+      });
     }
   };
 
+  const redirect = async () => {
+    setValues({
+      ...values,
+      message: "Congratulation , You Will be redirected to the login page",
+      isOpen: true,
+      severity: "success",
+    });
+    await delay(3000);
+    navigate("/login");
+  };
+
   useEffect(() => {
-    if (userParsed?.isverified) {
-      navigate("/home");
+    if (values.success) {
+      redirect();
+    } else {
+      verifyToken();
     }
-    verifyToken();
-  }, []);
+  }, [values.success]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     if (values.password !== values.confirmepassword) {
-      setVariant("danger");
-      setMessage("Password does not match !");
+      setValues({
+        ...values,
+        message: "Password does not match !",
+        isOpen: true,
+        severity: "warning",
+      });
     } else {
       try {
         const { data } = await axios.post(
           `/api/users/reset-password?token=${token}&id=${id}`,
-          { password: values.password }
+          {
+            password: values.password,
+          },
+          config
         );
-        if (data.success) {
-          setVariant("success");
-          setMessage(
-            "Congratulation , You Will be redirected to the login page"
-          );
-          setTimeout(() => {
-            navigate("/login");
-          }, 3000);
-        }
+        setValues({ ...values, data: data, success: true });
       } catch (error) {
-        setError(error.response.data.message);
+        setValues({
+          ...values,
+          message: error.response.data.error,
+          isOpen: true,
+          severity: "error",
+        });
       }
     }
   };
 
+  const handleClose = () => {
+    setValues({ ...values, isOpen: false });
+  };
+
+  const handleChange = (prop) => (event) => {
+    setValues({ ...values, [prop]: event.target.value });
+  };
+  const handleClickShowPassword = () => {
+    setValues({
+      ...values,
+      showPassword: !values.showPassword,
+    });
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
   return (
-    <div className="text-center m-5-auto">
-      <h2>Reset Password</h2>
-      {message && <ErrorMessage variant={variant}>{message}</ErrorMessage>}
-      {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
-      <form onSubmit={submitHandler}>
-        <p>
-          <label>New Password</label>
-          <br />
-          <input
-            type="password"
-            name="password"
-            required
-            value={values.password}
-            onChange={handlechange}
-          />
-        </p>
-        <p>
-          <label>Confirm Password</label>
-          <br />
-          <input
-            type="password"
-            name="confirmepassword"
-            required
-            value={values.confirmepassword}
-            onChange={handlechange}
-          />
-        </p>
-        <p>
-          <button id="sub_btn" type="submit">
-            Reset Password
-          </button>
-        </p>
-      </form>
+    <div className={styles.screen}>
+      <div className={styles.box}>
+        <div className={styles.inner_box}>
+          <div className={styles.forms_wrap}>
+            <form onSubmit={submitHandler}>
+              <div className={styles.logo}>
+                <img src={Marsa} alt="Logo" />
+              </div>
+              <div className={styles.heading}>
+                <h3>Changer Mot De Passe</h3>
+                <h6>
+                  Votre Nouveau Mot De Passe Doit être Différent Du Mot De Passe
+                  précédent.
+                </h6>
+              </div>
+              <FormControl variant="standard">
+                <InputLabel htmlFor="password">Mot De Passe</InputLabel>
+                <Input
+                  required
+                  id="password"
+                  type={values.showPassword ? "text" : "password"}
+                  value={values.password}
+                  onChange={handleChange("password")}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                      >
+                        {values.showPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+              <FormControl variant="standard">
+                <InputLabel htmlFor="confirmepassword">
+                  Confirmer Mot De Passe
+                </InputLabel>
+                <Input
+                  required
+                  id="confirmepassword"
+                  type={values.showPassword ? "text" : "password"}
+                  value={values.confirmepassword}
+                  onChange={handleChange("confirmepassword")}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                      >
+                        {values.showPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+
+              <Button
+                variant="contained"
+                color="error"
+                type="submit"
+                sx={{
+                  mt: 3,
+                  borderRadius: 4,
+                  "&:hover": { backgroundColor: "#3b3d3c" },
+                }}
+              >
+                Changer Mot De Passe
+              </Button>
+              <Link to="/" className={styles.link}>
+                <ArrowBack color="disabled" />
+                <span className={styles.toggle}>
+                  Retour à La Page D'accueil
+                </span>
+              </Link>
+            </form>
+          </div>
+          <Carousel />
+        </div>
+      </div>
+      <Notification
+        severity={values.severity}
+        message={values.message}
+        isOpen={values.isOpen}
+        onClose={handleClose}
+      />
     </div>
   );
 }

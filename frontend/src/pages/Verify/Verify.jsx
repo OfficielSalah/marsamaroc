@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Verify.css";
 import Loading from "../Loading";
-import ErrorMessage from "../errorMessage";
-import delay from "../delay";
+import delay from "../../helpers/delay";
 
 export default function Verify() {
   const [otp, setOtp] = useState("");
@@ -59,8 +58,6 @@ export default function Verify() {
   return (
     <div className="text-center m-5-auto">
       <h2>vérifier Votre Email</h2>
-      {message && <ErrorMessage variant={variant}>{message}</ErrorMessage>}
-      {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
       {loading && <Loading />}
       <form onSubmit={submitHandler}>
         <p>

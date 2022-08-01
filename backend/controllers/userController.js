@@ -51,7 +51,6 @@ const registerUser = asyncHandler(async (req, res, next) => {
       _id: user._id,
       login: user.login,
       email: user.email,
-      isverified: user.isverified,
     });
   } catch (error) {
     next(error);

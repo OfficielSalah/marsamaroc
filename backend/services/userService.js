@@ -164,6 +164,9 @@ const authUser = async (login, password) => {
   if (!(await user.matchPassword(password))) {
     throw new ErrorResponse("wrong Password", 403);
   }
+  if (!user.isverified) {
+    throw new ErrorResponse("Your Account is not yet Verified", 406);
+  }
 
   return {
     user: user,

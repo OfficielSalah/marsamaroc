@@ -2,10 +2,10 @@ import React from "react";
 import { useState, useEffect } from "react";
 import Sidebar from "../../layout/Sidebar/Sidebar";
 import axios from "axios";
-import ErrorMessage from "../errorMessage";
+
 import { useNavigate } from "react-router-dom";
 import Loading from "../Loading";
-import delay from "../delay";
+import delay from "../../helpers/delay";
 import "./Profile.css";
 
 export default function Profil() {
@@ -105,8 +105,6 @@ export default function Profil() {
       <Sidebar />
       <div className="profile">
         <h1 className="prof">Profil</h1>
-        {message && <ErrorMessage variant={variant}>{message}</ErrorMessage>}
-        {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
         {loading && <Loading />}
         <form className="form" onSubmit={submitHandler}>
           <div className="row button">
