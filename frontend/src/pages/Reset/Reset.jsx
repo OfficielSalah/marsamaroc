@@ -27,7 +27,6 @@ export default function Reset() {
     message: "",
     success: false,
     showPassword: false,
-    data: "",
     severity: "",
   });
   const location = useLocation();
@@ -48,7 +47,7 @@ export default function Reset() {
         ...values,
         message: error.response.data.error,
         isOpen: true,
-        severity: "error",
+        severity: "warning",
       });
     }
   };
@@ -83,14 +82,14 @@ export default function Reset() {
       });
     } else {
       try {
-        const { data } = await axios.post(
+        await axios.post(
           `/api/users/reset-password?token=${token}&id=${id}`,
           {
             password: values.password,
           },
           config
         );
-        setValues({ ...values, data: data, success: true });
+        setValues({ ...values, success: true });
       } catch (error) {
         setValues({
           ...values,

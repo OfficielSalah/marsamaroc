@@ -22,7 +22,6 @@ export default function Forget() {
     isOpen: false,
     message: "",
     success: false,
-    data: "",
     severity: "",
   });
   const config = {

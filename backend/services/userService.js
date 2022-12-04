@@ -158,11 +158,11 @@ const authUser = async (login, password) => {
   const user = await User.findOne({ login: login });
 
   if (!user) {
-    throw new ErrorResponse("user Not Found", 404);
+    throw new ErrorResponse("User Not Found", 404);
   }
 
   if (!(await user.matchPassword(password))) {
-    throw new ErrorResponse("wrong Password", 403);
+    throw new ErrorResponse("Wrong Password", 403);
   }
   if (!user.isverified) {
     throw new ErrorResponse("Your Account is not yet Verified", 406);

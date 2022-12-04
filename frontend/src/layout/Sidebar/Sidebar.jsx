@@ -17,7 +17,7 @@ export default function Sidebar() {
           </span>
         </div>
       </header>
-      <div className="login">{userParsed.login}</div>
+      <div className="login">{userParsed?.login}</div>
       <ul className="sidelist">
         {sidebarData.map((val, key) => {
           return (

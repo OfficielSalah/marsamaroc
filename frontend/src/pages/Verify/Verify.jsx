@@ -1,82 +1,153 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./Verify.css";
-import Loading from "../Loading";
+
+import Marsa from "../../assets/images/marsa-email.png";
+import Notification from "../../components/Notification";
+import styles from "./Verify.module.css";
+import Carousel from "../../layout/Carousel/Carousel";
 import delay from "../../helpers/delay";
 
+import {
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Input,
+  Button,
+} from "@mui/material";
+import { AlternateEmail, ArrowBack } from "@mui/icons-material";
+
 export default function Verify() {
-  const [otp, setOtp] = useState("");
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [variant, setVariant] = useState(null);
+  const [values, setValues] = useState({
+    otp: "",
+    isOpen: false,
+    message: "",
+    severity: "",
+    success: false,
+  });
+
   const userParsed = JSON.parse(localStorage.getItem("userInfo"));
-  const registerParsed = JSON.parse(localStorage.getItem("registerInfo"));
-  const user_Id = registerParsed?._id;
+  const registerInfo = JSON.parse(localStorage.getItem("registerInfo"));
+  const user_Id = registerInfo?._id;
+  const config = {
+    headers: { "Content-type": "application/json" },
+  };
+
   const navigate = useNavigate();
 
   const redirect = async () => {
-    setVariant("success");
-    setMessage("Congratulation ,votre address email est vérifier .");
+    setValues({
+      ...values,
+      message: "Congratulation ,votre address email est vérifier .",
+      isOpen: true,
+      severity: "success",
+    });
     await delay(3000);
-    setMessage("you will be redirected to the login page after a moment ...");
-    await delay(2000);
+    setValues({
+      ...values,
+      message: "you will be redirected to the login page after a moment ...",
+      isOpen: true,
+      severity: "success",
+    });
+    await delay(3000);
     navigate("/login");
   };
 
   useEffect(() => {
-    if (userParsed?.isverified) {
+    if (userParsed) {
       navigate("/home");
     }
-    if (success) {
+    if (values.success) {
       redirect();
     }
-  }, [success]);
+  }, [values.success]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
-      const config = {
-        headers: { "Content-type": "application/json" },
-      };
-      await axios.post("/api/users/verify-email", { user_Id, otp }, config);
+      await axios.post(
+        "/api/users/verify-email",
+        { user_Id: user_Id, otp: values.otp },
+        config
+      );
       localStorage.removeItem("registerInfo");
-      setLoading(false);
-      setSuccess(true);
+      setValues({ ...values, success: true });
     } catch (error) {
-      setLoading(false);
-      setError(error.response.data.error);
-      await delay(3000);
-      setError(null);
+      setValues({
+        ...values,
+        message: error.response.data.error,
+        isOpen: true,
+        severity: "error",
+      });
     }
   };
 
+  const handleClose = () => {
+    setValues({ ...values, isOpen: false });
+  };
+
+  const handleChange = (prop) => (event) => {
+    setValues({ ...values, [prop]: event.target.value });
+  };
+
   return (
-    <div className="text-center m-5-auto">
-      <h2>vérifier Votre Email</h2>
-      {loading && <Loading />}
-      <form onSubmit={submitHandler}>
-        <p>
-          <label>code OTP</label>
-          <br />
-          <input
-            type="text"
-            name="otp"
-            required
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-          />
-        </p>
-        <p>
-          <button id="sub_btn" type="submit">
-            Vérifier
-          </button>
-        </p>
-      </form>
+    <div className={styles.screen}>
+      <div className={styles.box}>
+        <div className={styles.inner_box}>
+          <div className={styles.forms_wrap}>
+            <form onSubmit={submitHandler}>
+              <div className={styles.logo}>
+                <img src={Marsa} alt="Logo" />
+              </div>
+              <div className={styles.heading}>
+                <h3>Vérifier Votre Email</h3>
+                <h6>Le Code OTP Est Envoyée A Votre Boite Email.</h6>
+              </div>
+              <FormControl variant="standard">
+                <InputLabel htmlFor="otp">Code OTP</InputLabel>
+                <Input
+                  required
+                  id="otp"
+                  type="text"
+                  value={values.otp}
+                  onChange={handleChange("otp")}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <AlternateEmail />
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+
+              <Button
+                variant="contained"
+                color="error"
+                type="submit"
+                sx={{
+                  mt: 3,
+                  borderRadius: 4,
+                  "&:hover": { backgroundColor: "#3b3d3c" },
+                }}
+              >
+                Vérifier
+              </Button>
+              <Link to="/" className={styles.link}>
+                <ArrowBack color="disabled" />
+                <span className={styles.toggle}>
+                  Retour à La Page D'accueil
+                </span>
+              </Link>
+            </form>
+          </div>
+          <Carousel />
+        </div>
+      </div>
+      <Notification
+        severity={values.severity}
+        message={values.message}
+        isOpen={values.isOpen}
+        onClose={handleClose}
+      />
     </div>
   );
 }

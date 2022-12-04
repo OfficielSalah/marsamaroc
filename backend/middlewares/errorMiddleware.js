@@ -1,8 +1,8 @@
-const errorHandler = (Error, req, res, next) => {
-  res.status(Error.statusCode || 500).json({
+const errorHandler = (err, req, res, next) => {
+  res.status(err.statusCode || 500).json({
     success: false,
-    error: Error.message || "Internal Server Error",
-    stack: process.env.NODE_ENV === "production" ? null : Error.stack,
+    error: err.message || "Internal Server Error",
+    stack: process.env.NODE_ENV === "production" ? null : err.stack,
   });
 };
 module.exports = errorHandler;

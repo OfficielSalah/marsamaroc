@@ -17,13 +17,13 @@ import Historique from "./pages/Historique/Historique";
 import Gestion from "./pages/Gestion/Gestion";
 import Verify from "./pages/Verify/Verify";
 import Lab from "./pages/Lab/Lab";
+import None from "./pages/None/None";
 
 export default function App() {
   return (
     <Router>
       <Routes>
         <Route exact path="/" element={<Navigate to="/login" />} />
-        <Route exact path="/test" element={<Lab />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<Verify />} />
         <Route path="/login" element={<Login />} />
@@ -34,7 +34,8 @@ export default function App() {
         <Route path="/ajouter" element={<Ajouter />} />
         <Route path="/historique" element={<Historique />} />
         <Route path="/gestion" element={<Gestion />} />
-        <Route path="*" element={<p>There's nothing here: 404!</p>} />
+        <Route exact path="/test" element={<Lab />} />
+        <Route path="*" element={<None />} />
       </Routes>
     </Router>
   );

@@ -16,7 +16,7 @@ export default function Home() {
   }, []);
   return (
     <div className="homee">
-      <Sidebar login={user.login} />
+      <Sidebar login={user?.login} />
       <div className="bien">
         <h1>Bienvenue Dans Votre Compte Personnel</h1>
         <div className="rule">
